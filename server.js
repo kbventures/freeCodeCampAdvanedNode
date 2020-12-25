@@ -1,3 +1,6 @@
+// https://repl.it/@kbventures/boilerplate-advancednode#server.js
+// https://boilerplate-advancednode.kbventures.repl.co
+
 'use strict';
 require('dotenv').config();
 const express = require('express');
@@ -11,10 +14,27 @@ app.use('/public', express.static(process.cwd() + '/public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.set('view engine', 'pug');
+
 app.route('/').get((req, res) => {
-  res.render('Load your view here');
+  res.render(__dirname + '/views/pug/index.pug', {title: 'Hello World', message: 'Please Login'});
 });
 
 app.listen(process.env.PORT || 3000, () => {
   console.log('Listening on port ' + process.env.PORT);
 });
+
+
+/*
+
+process.cwd() returns the current working directory,
+
+i.e. the directory from which you invoked the node command.
+
+__dirname returns the directory name of the directory containing 
+
+the JavaScript source code file
+
+https://stackoverflow.com/questions/9874382/whats-the-difference-between-process-cwd-vs-dirname
+
+*/
