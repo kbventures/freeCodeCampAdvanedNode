@@ -8,6 +8,7 @@ const myDB = require('./connection');
 const fccTesting = require('./freeCodeCamp/fcctesting.js');
 const session = require('express-session');
 const passport = require('passport');
+const ObjectID = require('mongodb').ObjectID;
 
 
 const app = express();
@@ -26,6 +27,21 @@ app.use(session({
   saveUninitialized: true,
   cookie: {secure: false}
 }), passport.initialize(), passport.session());
+
+
+passport.serializeUser((user,done)=>{
+  done(null, user._id);
+});
+
+passport.deserializeUser((id, done)=>{
+  myDataBase.findOne({ _id: new ObjectID(id)}, (err, doc)=>{
+    done(null, null);
+  });
+});
+
+
+
+
 
 app.route('/').get((req, res) => {
   console.log(req.session)
