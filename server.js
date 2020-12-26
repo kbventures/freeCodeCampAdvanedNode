@@ -8,6 +8,7 @@ const myDB = require('./connection');
 const fccTesting = require('./freeCodeCamp/fcctesting.js');
 const session = require('express-session');
 const passport = require('passport');
+// Using Capital here because it is a constructor
 const ObjectID = require('mongodb').ObjectID;
 
 
@@ -29,41 +30,27 @@ app.use(session({
 }), passport.initialize(), passport.session());
 
 
-passport.serializeUser((user,done)=>{
-  done(null, user._id);
-});
+myDB(async client => {
+    const myDataBase = await client.db('fccAdvancedNode').collection('users');
 
-passport.deserializeUser((id, done)=>{
-  myDataBase.findOne({ _id: new ObjectID(id)}, (err, doc)=>{
-    done(null, null);
-  });
-});
+    app.listen(process.env.PORT || 3000, () => {
+      console.log('Listening on port ' + process.env.PORT);
+    });
 
+    app.route('/').get((req, res) => {
+      res.render('index', {title: 'Connected to Database', message: 'Please login'});
+    });
 
+    /* Save User Id to a cookie */
+    passport.serializeUser((user,done)=>{
+      done(null, user._id);
+    });
 
+    /* Retrieve User details from cookie  */
+    passport.deserializeUser((id, done)=>{
+      myDataBase.findOne({ _id: new ObjectID(id)}, (err, doc)=>{
+        done(null, doc);
+      });
+    })
+})
 
-
-app.route('/').get((req, res) => {
-  console.log(req.session)
-  req.session.count ++
-  res.render('index', {title: 'Hello', message: 'Please login'});
-});
-
-app.listen(process.env.PORT || 3000, () => {
-  console.log('Listening on port ' + process.env.PORT);
-});
-
-
-/*
-
-process.cwd() returns the current working directory,
-
-i.e. the directory from which you invoked the node command.
-
-__dirname returns the directory name of the directory containing 
-
-the JavaScript source code file
-
-https://stackoverflow.com/questions/9874382/whats-the-difference-between-process-cwd-vs-dirname
-
-*/
