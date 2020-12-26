@@ -8,7 +8,7 @@ const myDB = require('./connection');
 const fccTesting = require('./freeCodeCamp/fcctesting.js');
 const session = require('express-session');
 const passport = require('passport');
-const { request } = require('https');
+
 
 const app = express();
 
@@ -17,21 +17,20 @@ app.use('/public', express.static(process.cwd() + '/public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.set('view engine', 'pug');
+app.set('views', './views/pug')
+
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave:true,
   saveUninitialized: true,
   cookie: {secure: false}
-}));
-app.use(passport.initialize());
-
-app.set('view engine', 'pug');
-app.set('views', './views/pug')
+}), passport.initialize(), passport.session());
 
 app.route('/').get((req, res) => {
   console.log(req.session)
   req.session.count ++
-  res.render('index', {title: 'Hello World', message: 'Please Login'});
+  res.render('index', {title: 'Hello', message: 'Please login'});
 });
 
 app.listen(process.env.PORT || 3000, () => {
